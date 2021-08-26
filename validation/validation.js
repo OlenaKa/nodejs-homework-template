@@ -1,4 +1,5 @@
-const Joi = require("joi")
+const Joi = require('joi')
+const mongoose = require('mongoose')
 
 const schemaCreateContact = Joi.object({
   name: Joi.string().min(3).max(30).required(),
@@ -8,9 +9,10 @@ const schemaCreateContact = Joi.object({
   email: Joi.string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "uk", "ca"] },
+      tlds: { allow: ['com', 'net', 'uk', 'ca'] },
     })
     .required(),
+  favorite: Joi.string().optional(),
 })
 
 const schemaUpdateContact = Joi.object({
@@ -21,10 +23,15 @@ const schemaUpdateContact = Joi.object({
   email: Joi.string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "uk", "ca"] },
+      tlds: { allow: ['com', 'net', 'uk', 'ca'] },
     })
     .optional(),
-}).xor("name", "phone", "email")
+  favorite: Joi.string().optional(),
+}).or('name', 'phone', 'email', 'favorite')
+
+const schemaUpdateStatusContact = Joi.object({
+  favorite: Joi.string().required(),
+})
 
 const validate = async (schema, obj, next) => {
   try {
@@ -33,16 +40,28 @@ const validate = async (schema, obj, next) => {
   } catch (err) {
     next({
       status: 400,
-      message: err.message.replace(/"/g, ""),
+      message: err.message.replace(/"/g, ''),
     })
   }
 }
 
 module.exports = {
-  validationCreateContact: (req, res, next) => {
+  validationCreateContact: (req, _, next) => {
     return validate(schemaCreateContact, req.body, next)
   },
-  validationUpdateContact: (req, res, next) => {
+  validationUpdateContact: (req, _, next) => {
     return validate(schemaUpdateContact, req.body, next)
+  },
+  validationUpdateStatusContact: (req, _, next) => {
+    return validate(schemaUpdateStatusContact, req.body, next)
+  },
+  validationID: (req, _, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.contactId)) {
+      return next({
+        status: 400,
+        message: 'ID is not valid',
+      })
+    }
+    next()
   },
 }
