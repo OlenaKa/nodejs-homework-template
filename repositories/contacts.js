@@ -29,10 +29,20 @@ const updateContact = async (contactId, body) => {
   return contact
 }
 
+const updateContactStatus = async (contactId, body) => {
+  const contact = await Contact.findByIdAndUpdate(
+    { _id: contactId },
+    { favorite: body.favorute },
+    { new: true }
+  )
+  return contact
+}
+
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateContactStatus,
 }

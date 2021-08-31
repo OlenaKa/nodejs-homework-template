@@ -6,6 +6,7 @@ const {
   contactAdd,
   contactDell,
   contactUpdate,
+  contactStatusUpdate,
 } = require('../../controllers/contacts-ctrl')
 
 const {
@@ -26,7 +27,7 @@ router.patch(
   '/:contactId/favorite',
   validationID,
   validationUpdateStatusContact,
-  contactUpdate
+  contactStatusUpdate
 )
 
 module.exports = router
