@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const guard = require('../../helpers/guard')
 const {
   getAll,
   getById,
@@ -14,14 +15,22 @@ const {
   validationUpdateContact,
   validationUpdateStatusContact,
   validationID,
-} = require('../../validation/validation')
-
-router.get('/', getAll).post('/', validationCreateContact, contactAdd)
+} = require('../../validation/validationContacts')
 
 router
-  .get('/:contactId', validationID, getById)
-  .delete('/:contactId', validationID, contactDell)
-  .put('/:contactId', validationID, validationUpdateContact, contactUpdate)
+  .get('/', guard, getAll)
+  .post('/', guard, validationCreateContact, contactAdd)
+
+router
+  .get('/:contactId', guard, validationID, getById)
+  .delete('/:contactId', guard, validationID, contactDell)
+  .put(
+    '/:contactId',
+    guard,
+    validationID,
+    validationUpdateContact,
+    contactUpdate
+  )
 
 router.patch(
   '/:contactId/favorite',
