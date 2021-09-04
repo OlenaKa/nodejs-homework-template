@@ -44,10 +44,10 @@ const updateContact = async (userId, contactId, body) => {
   return contact
 }
 
-const updateContactStatus = async (contactId, body) => {
+const updateContactStatus = async (userId, contactId, body) => {
   const contact = await Contact.findByIdAndUpdate(
-    { _id: contactId },
-    { favorite: body.favorute },
+    { _id: contactId, owner: userId },
+    { favorite: body.favorite },
     { new: true }
   )
   return contact

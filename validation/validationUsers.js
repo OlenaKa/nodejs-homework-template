@@ -1,12 +1,15 @@
 const Joi = require('joi')
-// const mongoose = require('mongoose')
-
-const MAIL_REG_EX =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+const { MAIL_REG_EX, HTTP_CODE } = require('../helpers/constants')
 
 const schemaUser = Joi.object({
   email: Joi.string().pattern(MAIL_REG_EX).required(),
   password: Joi.string().min(6).required(),
+})
+
+const schemaSubscription = Joi.object({
+  subscription: Joi.string()
+    .pattern(/^(starter|pro|business)$/)
+    .required(),
 })
 
 const validate = async (schema, obj, next) => {
@@ -15,29 +18,17 @@ const validate = async (schema, obj, next) => {
     next()
   } catch (err) {
     next({
-      status: 400,
+      status: HTTP_CODE.BAD_REQUEST,
       message: err.message.replace(/"/g, ''),
     })
   }
 }
 
 module.exports = {
-  validationUser: (req, _, next) => {
+  validationUser: (req, _res, next) => {
     return validate(schemaUser, req.body, next)
   },
-  // validationUpdateContact: (req, _, next) => {
-  //   return validate(schemaUpdateContact, req.body, next)
-  // },
-  // validationUpdateStatusContact: (req, _, next) => {
-  //   return validate(schemaUpdateStatusContact, req.body, next)
-  // },
-  // validationID: (req, _, next) => {
-  //   if (!mongoose.Types.ObjectId.isValid(req.params.contactId)) {
-  //     return next({
-  //       status: 400,
-  //       message: 'ID is not valid',
-  //     })
-  //   }
-  //   next()
-  // },
+  validationSubscription: (req, _res, next) => {
+    return validate(schemaSubscription, req.body, next)
+  },
 }

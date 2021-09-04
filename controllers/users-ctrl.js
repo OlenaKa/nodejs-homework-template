@@ -5,6 +5,8 @@ const {
   findUserByEmail,
   createUser,
   updateToken,
+  updateUserSubsrciption,
+  findUserById,
 } = require('../repositories/users')
 const jwt = require('jsonwebtoken')
 
@@ -63,5 +65,49 @@ const logout = async (req, res, next) => {
     next(e)
   }
 }
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id
+    const user = await findUserById(userId)
 
-module.exports = { signup, login, logout }
+    if (!user) {
+      return res.status(HTTP_CODE.UNAUTHORIZED).json({
+        status: 'error',
+        code: HTTP_CODE.UNAUTHORIZED,
+        message: 'Not authorized',
+      })
+    }
+    const { email, subscription } = user
+    return res.status(HTTP_CODE.OK).json({
+      status: 'success',
+      code: HTTP_CODE.OK,
+      data: { email, subscription },
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+const updateSubsrciption = async (req, res, next) => {
+  try {
+    const userId = req.user.id
+    const user = await updateUserSubsrciption(userId, req.body)
+    const { id, email, subscription } = user
+    if (user) {
+      return res.status(HTTP_CODE.OK).json({
+        status: 'success',
+        code: HTTP_CODE.OK,
+        data: { id, email, subscription },
+      })
+    }
+    return res.status(HTTP_CODE.NOT_FOUND).json({
+      status: 'error',
+      code: HTTP_CODE.NOT_FOUND,
+      message: 'Not found',
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+
+module.exports = { signup, login, logout, getCurrentUser, updateSubsrciption }

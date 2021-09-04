@@ -34,6 +34,7 @@ router
 
 router.patch(
   '/:contactId/favorite',
+  guard,
   validationID,
   validationUpdateStatusContact,
   contactStatusUpdate

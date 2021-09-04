@@ -12,4 +12,6 @@ const HTTP_CODE = {
 const MAIL_REG_EX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
-module.exports = { HTTP_CODE, MAIL_REG_EX }
+const PHONE_REX_EX = /(\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/
+
+module.exports = { HTTP_CODE, MAIL_REG_EX, PHONE_REX_EX }
