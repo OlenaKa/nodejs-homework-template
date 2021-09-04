@@ -1,5 +1,9 @@
 const Joi = require('joi')
-const { MAIL_REG_EX, HTTP_CODE } = require('../helpers/constants')
+const {
+  MAIL_REG_EX,
+  HTTP_CODE,
+  SUBSCRIPTION_REG_EX,
+} = require('../helpers/constants')
 
 const schemaUser = Joi.object({
   email: Joi.string().pattern(MAIL_REG_EX).required(),
@@ -7,9 +11,7 @@ const schemaUser = Joi.object({
 })
 
 const schemaSubscription = Joi.object({
-  subscription: Joi.string()
-    .pattern(/^(starter|pro|business)$/)
-    .required(),
+  subscription: Joi.string().pattern(SUBSCRIPTION_REG_EX).required(),
 })
 
 const validate = async (schema, obj, next) => {

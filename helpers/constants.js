@@ -14,4 +14,6 @@ const MAIL_REG_EX =
 
 const PHONE_REX_EX = /(\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/
 
-module.exports = { HTTP_CODE, MAIL_REG_EX, PHONE_REX_EX }
+const SUBSCRIPTION_REG_EX = /^(starter|pro|business)$/
+
+module.exports = { HTTP_CODE, MAIL_REG_EX, PHONE_REX_EX, SUBSCRIPTION_REG_EX }
