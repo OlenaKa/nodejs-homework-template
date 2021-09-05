@@ -4,7 +4,7 @@ const listContacts = async (userId, query) => {
   const { favorite = null, limit = 4, offset = 0 } = query
 
   const searchOptions = { owner: userId }
-  if (favorite !== null) {
+  if (favorite) {
     searchOptions.favorite = true
   }
   const data = await Contact.paginate(searchOptions, { limit, offset })
