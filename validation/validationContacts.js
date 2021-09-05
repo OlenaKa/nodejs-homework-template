@@ -1,31 +1,18 @@
 const Joi = require('joi')
 const mongoose = require('mongoose')
+const { MAIL_REG_EX, HTTP_CODE, PHONE_REX_EX } = require('../helpers/constants')
 
 const schemaCreateContact = Joi.object({
   name: Joi.string().min(3).max(30).required(),
-  phone: Joi.string()
-    .pattern(/(\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/)
-    .required(),
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'uk', 'ca'] },
-    })
-    .required(),
+  phone: Joi.string().pattern(PHONE_REX_EX).required(),
+  email: Joi.string().pattern(MAIL_REG_EX).required(),
   favorite: Joi.string().optional(),
 })
 
 const schemaUpdateContact = Joi.object({
   name: Joi.string().min(3).max(30).optional(),
-  phone: Joi.string()
-    .pattern(/(\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/)
-    .optional(),
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'uk', 'ca'] },
-    })
-    .optional(),
+  phone: Joi.string().pattern(PHONE_REX_EX).optional(),
+  email: Joi.string().pattern(MAIL_REG_EX).optional(),
   favorite: Joi.string().optional(),
 }).or('name', 'phone', 'email', 'favorite')
 
@@ -39,7 +26,7 @@ const validate = async (schema, obj, next) => {
     next()
   } catch (err) {
     next({
-      status: 400,
+      status: HTTP_CODE.BAD_REQUEST,
       message: err.message.replace(/"/g, ''),
     })
   }
@@ -58,7 +45,7 @@ module.exports = {
   validationID: (req, _, next) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.contactId)) {
       return next({
-        status: 400,
+        status: HTTP_CODE.BAD_REQUEST,
         message: 'ID is not valid',
       })
     }

@@ -1,3 +1,4 @@
+const { HTTP_CODE } = require('../helpers/constants')
 const {
   listContacts,
   getContactById,
@@ -7,12 +8,18 @@ const {
   updateContactStatus,
 } = require('../repositories/contacts')
 
-const getAll = async (_, res, next) => {
+const getAll = async (req, res, next) => {
   try {
-    const contactsList = await listContacts()
-    res
-      .status(200)
-      .json({ status: 'success', code: 200, data: { contactsList } })
+    const userId = req.user.id
+    const { docs: contactsList, ...rest } = await listContacts(
+      userId,
+      req.query
+    )
+    res.status(HTTP_CODE.OK).json({
+      status: 'success',
+      code: HTTP_CODE.OK,
+      data: { contactsList, ...rest },
+    })
   } catch (e) {
     next(e)
   }
@@ -20,15 +27,16 @@ const getAll = async (_, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const contact = await getContactById(req.params.contactId)
+    const userId = req.user.id
+    const contact = await getContactById(userId, req.params.contactId)
     if (contact) {
       return res
-        .status(200)
-        .json({ status: 'success', code: 200, data: { contact } })
+        .status(HTTP_CODE.OK)
+        .json({ status: 'success', code: HTTP_CODE.OK, data: { contact } })
     }
-    return res.status(400).json({
+    return res.status(HTTP_CODE.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HTTP_CODE.BAD_REQUEST,
       message: 'contact with such id wad not found',
     })
   } catch (e) {
@@ -38,8 +46,11 @@ const getById = async (req, res, next) => {
 
 const contactAdd = async (req, res, next) => {
   try {
-    const contact = await addContact(req.body)
-    res.status(201).json({ status: 'success', code: 201, data: { contact } })
+    const userId = req.user.id
+    const contact = await addContact(req.body, userId)
+    res
+      .status(HTTP_CODE.CREATED)
+      .json({ status: 'success', code: HTTP_CODE.CREATED, data: { contact } })
   } catch (e) {
     next(e)
   }
@@ -47,17 +58,18 @@ const contactAdd = async (req, res, next) => {
 
 const contactDell = async (req, res, next) => {
   try {
-    const contact = await removeContact(req.params.contactId)
+    const userId = req.user.id
+    const contact = await removeContact(userId, req.params.contactId)
     if (contact) {
-      return res.status(200).json({
+      return res.status(HTTP_CODE.OK).json({
         status: 'success',
-        code: 200,
+        code: HTTP_CODE.OK,
         data: { contact },
       })
     }
-    return res.status(400).json({
+    return res.status(HTTP_CODE.BAD_REQUEST).json({
       status: 'error',
-      code: 400,
+      code: HTTP_CODE.BAD_REQUEST,
       message: 'contact with such id wad not found',
     })
   } catch (e) {
@@ -67,15 +79,16 @@ const contactDell = async (req, res, next) => {
 
 const contactUpdate = async (req, res, next) => {
   try {
-    const contact = await updateContact(req.params.contactId, req.body)
+    const userId = req.user.id
+    const contact = await updateContact(userId, req.params.contactId, req.body)
     if (contact) {
       return res
-        .status(200)
-        .json({ status: 'success', code: 200, data: { contact } })
+        .status(HTTP_CODE.OK)
+        .json({ status: 'success', code: HTTP_CODE.OK, data: { contact } })
     }
-    return res.status(404).json({
+    return res.status(HTTP_CODE.NOT_FOUND).json({
       status: 'error',
-      code: 404,
+      code: HTTP_CODE.NOT_FOUND,
       message: 'Not found',
     })
   } catch (e) {
@@ -85,15 +98,20 @@ const contactUpdate = async (req, res, next) => {
 
 const contactStatusUpdate = async (req, res, next) => {
   try {
-    const contact = await updateContactStatus(req.params.contactId, req.body)
+    const userId = req.user.id
+    const contact = await updateContactStatus(
+      userId,
+      req.params.contactId,
+      req.body
+    )
     if (contact) {
       return res
-        .status(200)
-        .json({ status: 'success', code: 200, data: { contact } })
+        .status(HTTP_CODE.OK)
+        .json({ status: 'success', code: HTTP_CODE.OK, data: { contact } })
     }
-    return res.status(404).json({
+    return res.status(HTTP_CODE.NOT_FOUND).json({
       status: 'error',
-      code: 404,
+      code: HTTP_CODE.NOT_FOUND,
       message: 'Not found',
     })
   } catch (e) {
