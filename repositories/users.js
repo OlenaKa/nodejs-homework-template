@@ -21,7 +21,7 @@ const updateUserSubsrciption = async (id, body) => {
   const user = await User.findByIdAndUpdate(
     { _id: id },
     { subscription: body.subscription },
-    { new: true }
+    { new: true, runValidators: true }
   )
   return user
 }
