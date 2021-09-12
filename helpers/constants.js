@@ -16,4 +16,12 @@ const PHONE_REX_EX = /(\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/
 
 const SUBSCRIPTION_REG_EX = /^(starter|pro|business)$/
 
-module.exports = { HTTP_CODE, MAIL_REG_EX, PHONE_REX_EX, SUBSCRIPTION_REG_EX }
+const UPLOAD_DIR = 'tmp'
+
+module.exports = {
+  HTTP_CODE,
+  MAIL_REG_EX,
+  PHONE_REX_EX,
+  SUBSCRIPTION_REG_EX,
+  UPLOAD_DIR,
+}
