@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1631487427355" clover="3.2.0">
-  <project timestamp="1631487427355" name="All files">
+<coverage generated="1631623391884" clover="3.2.0">
+  <project timestamp="1631623391884" name="All files">
     <metrics statements="320" coveredstatements="186" conditionals="50" coveredconditionals="13" methods="49" coveredmethods="14" elements="419" coveredelements="213" complexity="0" loc="320" ncloc="320" packages="8" files="17" classes="17"/>
     <package name="nodejs-homework-template">
       <metrics statements="21" coveredstatements="17" conditionals="6" coveredconditionals="1" methods="2" coveredmethods="0"/>

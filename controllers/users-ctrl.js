@@ -12,7 +12,6 @@ const {
 const jwt = require('jsonwebtoken')
 const saveNewAvatar = require('../services/avatar-transform')
 const deleteOldAvatar = require('../helpers/delete-avatar')
-// const path = require('path')
 
 const signup = async (req, res, next) => {
   try {

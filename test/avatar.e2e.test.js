@@ -7,6 +7,7 @@ const User = require('../model/user')
 const fs = require('fs/promises')
 const path = require('path')
 const { updateToken } = require('../repositories/users')
+const { HTTP_CODE } = require('../helpers/constants')
 
 jest.mock('../services/avatar-transform')
 
@@ -42,7 +43,7 @@ describe('update avatar', () => {
       .patch('/api/users/avatars')
       .set('Authorization', `Invalid token`)
       .attach('avatar', './test/avatars/monster-fun.jpg')
-    expect(response.status).toEqual(401)
+    expect(response.status).toEqual(HTTP_CODE.UNAUTHORIZED)
     expect(response.body).toBeDefined()
   })
 
@@ -52,7 +53,7 @@ describe('update avatar', () => {
       .set('Authorization', `Bearer ${token}`)
       .attach('avatar', './test/avatars/monster-fun.jpg')
 
-    expect(response.status).toEqual(200)
+    expect(response.status).toEqual(HTTP_CODE.OK)
     expect(response.body).toBeDefined()
     expect(response.body.data.avatarUrl).toEqual('newPath')
   })
