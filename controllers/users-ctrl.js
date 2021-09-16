@@ -7,8 +7,11 @@ const {
   updateToken,
   updateUserSubsrciption,
   findUserById,
+  updateUserAvatar,
 } = require('../repositories/users')
 const jwt = require('jsonwebtoken')
+const saveNewAvatar = require('../services/avatar-transform')
+const deleteOldAvatar = require('../helpers/delete-avatar')
 
 const signup = async (req, res, next) => {
   try {
@@ -20,11 +23,11 @@ const signup = async (req, res, next) => {
         message: 'Email is already used',
       })
     }
-    const { id, email, subscription } = await createUser(req.body)
+    const { id, email, subscription, avatarUrl } = await createUser(req.body)
     return res.status(HTTP_CODE.CREATED).json({
       status: 'success',
       code: HTTP_CODE.CREATED,
-      data: { id, email, subscription },
+      data: { id, email, subscription, avatarUrl },
     })
   } catch (e) {
     next(e)
@@ -77,11 +80,11 @@ const getCurrentUser = async (req, res, next) => {
         message: 'Not authorized',
       })
     }
-    const { email, subscription } = user
+    const { email, subscription, avatarUrl } = user
     return res.status(HTTP_CODE.OK).json({
       status: 'success',
       code: HTTP_CODE.OK,
-      data: { email, subscription },
+      data: { email, subscription, avatarUrl },
     })
   } catch (e) {
     next(e)
@@ -110,4 +113,30 @@ const updateSubsrciption = async (req, res, next) => {
   }
 }
 
-module.exports = { signup, login, logout, getCurrentUser, updateSubsrciption }
+const avatars = async (req, res, next) => {
+  try {
+    const id = req.user.id
+    const newAvatar = await saveNewAvatar({ userId: id, file: req.file })
+    const { _id, email, subscription, avatarUrl } = await updateUserAvatar(
+      id,
+      newAvatar
+    )
+    await deleteOldAvatar(req.user.avatarUrl)
+
+    return res.status(HTTP_CODE.OK).json({
+      status: 'success',
+      code: HTTP_CODE.OK,
+      data: { _id, email, subscription, avatarUrl },
+    })
+  } catch (e) {
+    next(e)
+  }
+}
+module.exports = {
+  signup,
+  login,
+  logout,
+  getCurrentUser,
+  updateSubsrciption,
+  avatars,
+}
