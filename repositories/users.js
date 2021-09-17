@@ -1,12 +1,16 @@
+const { verify } = require('jsonwebtoken')
 const User = require('../model/user')
 
 const findUserById = async (id) => {
   return await User.findById(id)
 }
 
+const findUserByVfToken = async (verifyToken) => {
+  return await User.findOne({ verifyToken })
+}
+
 const findUserByEmail = async (email) => {
-  const user = await User.findOne({ email })
-  return user
+  return await User.findOne({ email })
 }
 
 const createUser = async (body) => {
@@ -15,6 +19,10 @@ const createUser = async (body) => {
 }
 const updateToken = async (id, token) => {
   return await User.findByIdAndUpdate({ _id: id }, { token })
+}
+
+const updateVfToken = async (id, verify, verifyToken) => {
+  return await User.findByIdAndUpdate({ _id: id }, { verify, verifyToken })
 }
 
 const updateUserSubsrciption = async (id, body) => {
@@ -41,4 +49,6 @@ module.exports = {
   updateToken,
   updateUserSubsrciption,
   updateUserAvatar,
+  findUserByVfToken,
+  updateVfToken,
 }

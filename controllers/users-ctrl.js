@@ -8,7 +8,10 @@ const {
   updateUserSubsrciption,
   findUserById,
   updateUserAvatar,
+  findUserByVfToken,
+  updateVfToken,
 } = require('../repositories/users')
+const VerificationEmailService = require('../services/email')
 const jwt = require('jsonwebtoken')
 const saveNewAvatar = require('../services/avatar-transform')
 const deleteOldAvatar = require('../helpers/delete-avatar')
@@ -23,7 +26,16 @@ const signup = async (req, res, next) => {
         message: 'Email is already used',
       })
     }
-    const { id, email, subscription, avatarUrl } = await createUser(req.body)
+    const { id, email, subscription, avatarUrl, verifyToken } =
+      await createUser(req.body)
+
+    try {
+      const verification = new VerificationEmailService(process.env.NODE_ENV)
+      await verification.sendVfEmail(verifyToken, email)
+    } catch (error) {
+      console.log(error.message)
+    }
+
     return res.status(HTTP_CODE.CREATED).json({
       status: 'success',
       code: HTTP_CODE.CREATED,
@@ -34,11 +46,54 @@ const signup = async (req, res, next) => {
   }
 }
 
+const emailVerification = async (req, res, next) => {
+  try {
+    const user = await findUserByVfToken(req.params.verificationToken)
+    if (user) {
+      await updateVfToken(user.id, true, null)
+      return res.status(HTTP_CODE.OK).json({
+        status: 'success',
+        code: HTTP_CODE.OK,
+        message: 'Your email is successfully verified',
+      })
+    }
+    return res.status(HTTP_CODE.NOT_FOUND).json({
+      status: 'error',
+      code: HTTP_CODE.NOT_FOUND,
+      message: 'User not found',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const repeatEmailVerification = async (req, res, next) => {
+  try {
+    const { verify, verifyToken } = await findUserByEmail(req.body.email)
+    if (verify) {
+      return res.status(HTTP_CODE.CONFLICT).json({
+        status: 'error',
+        code: HTTP_CODE.CONFLICT,
+        message: 'Email is already verified',
+      })
+    }
+    const verification = new VerificationEmailService(process.env.NODE_ENV)
+    await verification.sendVfEmail(verifyToken, req.body.email)
+    return res.status(HTTP_CODE.OK).json({
+      status: 'success',
+      code: HTTP_CODE.OK,
+      message: 'Verification e-mail sent',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 const login = async (req, res, next) => {
   try {
     const user = await findUserByEmail(req.body.email)
     const validPassword = await user?.isValidPassword(req.body.password)
-    if (!user || !validPassword) {
+    if (!user || !validPassword || !user.verify) {
       return res.status(HTTP_CODE.UNAUTHORIZED).json({
         status: 'error',
         code: HTTP_CODE.UNAUTHORIZED,
@@ -59,6 +114,7 @@ const login = async (req, res, next) => {
     next(e)
   }
 }
+
 const logout = async (req, res, next) => {
   try {
     const { id } = req.user
@@ -139,4 +195,6 @@ module.exports = {
   getCurrentUser,
   updateSubsrciption,
   avatars,
+  emailVerification,
+  repeatEmailVerification,
 }
